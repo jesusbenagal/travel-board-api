@@ -5,6 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 
+import { PrismaService } from './database/prisma.service';
+
 import { RequestIdInterceptor } from './config/interceptors/request-id.interceptor';
 import { HttpExceptionFilter } from './config/filters/http-exception.filter';
 
@@ -13,6 +15,9 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.enableVersioning({ type: VersioningType.URI });
+
+  const prisma = app.get(PrismaService);
+  prisma.enableShutdownHooks(app);
 
   const config = app.get(ConfigService);
   const origins = (config.get<string>('CORS_ORIGINS') ?? '')

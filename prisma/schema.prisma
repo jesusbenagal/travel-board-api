@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum MemberStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
+}
+
+enum Visibility {
+  PRIVATE
+  LINK
+}
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String
+  name         String?
+  avatarUrl    String?
+
+  tripsOwned  Trip[]       @relation("TripsOwned")
+  memberships TripMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Trip {
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation("TripsOwned", fields: [ownerId], references: [id])
+
+  title       String     @db.VarChar(140)
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  timezone    String
+  visibility  Visibility @default(PRIVATE)
+
+  members TripMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model TripMember {
+  id     String       @id @default(cuid())
+  tripId String
+  userId String
+  role   Role
+  status MemberStatus
+
+  trip Trip @relation(fields: [tripId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([tripId, userId])
+  @@index([userId])
+}
