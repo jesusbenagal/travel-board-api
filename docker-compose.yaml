@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: test12345@
+      POSTGRES_DB: travel-board
+    container_name: travel-board-db
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
