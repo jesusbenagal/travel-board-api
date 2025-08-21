@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
+
+import { UtilitiesModule } from './utilities/utilities.module';
+import { PrismaModule } from './database/prisma.module';
 
 import { validateEnv } from './config/env.validation';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { UtilitiesModule } from './utilities/utilities.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { UtilitiesModule } from './utilities/utilities.module';
       ],
     }),
     UtilitiesModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [],
