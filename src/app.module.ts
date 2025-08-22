@@ -4,6 +4,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 import { UtilitiesModule } from './utilities/utilities.module';
 import { PrismaModule } from './database/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 import { validateEnv } from './config/env.validation';
 
@@ -23,6 +24,7 @@ import { validateEnv } from './config/env.validation';
     }),
     UtilitiesModule,
     PrismaModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

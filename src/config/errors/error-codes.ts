@@ -5,12 +5,16 @@ export type ErrorCode =
   | 'TRIP_FORBIDDEN'
   | 'TRIP_NOT_FOUND'
   | 'VALIDATION_ERROR'
+  | 'NOT_FOUND'
   | 'INTERNAL_ERROR';
 
+export interface ErrorPayload {
+  code: ErrorCode;
+  message: string;
+  details?: unknown;
+  requestId?: string;
+}
+
 export interface ErrorResponse {
-  error: {
-    code: ErrorCode;
-    message: string;
-    details?: any;
-  };
+  error: ErrorPayload;
 }
