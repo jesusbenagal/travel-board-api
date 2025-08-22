@@ -9,9 +9,12 @@ import { PrismaService } from './database/prisma.service';
 
 import { RequestIdInterceptor } from './config/interceptors/request-id.interceptor';
 import { HttpExceptionFilter } from './config/filters/http-exception.filter';
+import { requestIdMiddleware } from './config/middleware/request-id.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(requestIdMiddleware);
 
   app.setGlobalPrefix('api/v1');
   app.enableVersioning({ type: VersioningType.URI });
@@ -48,6 +51,7 @@ async function bootstrap() {
     .addBearerAuth()
     // TODO: Add tags when other modules are created
     .addTag('Utilities')
+    .addTag('Auth')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
