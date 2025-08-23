@@ -19,5 +19,11 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "src/**/*.d.ts<", "prisma/**/*.ts"]
+  "include": [
+    "src/**/*",
+    "src/**/*.d.ts",
+    "prisma/**/*.ts",
+    "test/**/*.ts",
+    "jest.config.ts"
+  ]
 }
