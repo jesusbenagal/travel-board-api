@@ -30,7 +30,7 @@ export interface PaginationMeta {
   total: number;
 }
 
-export interface PaginationResponse<T> {
+export interface PaginatedResponse<T> {
   data: T[];
   pagination: PaginationMeta;
 }

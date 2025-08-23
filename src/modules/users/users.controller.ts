@@ -17,11 +17,11 @@ import { UpdateMeDto } from './dto';
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly users: UsersService) {}
 
   @Get('me')
   async getMe(@CurrentUser() user: AuthUser): Promise<PublicUser> {
-    return this.usersService.getMe(user.userId);
+    return this.users.getMe(user.userId);
   }
 
   @Patch('me')
@@ -29,6 +29,6 @@ export class UsersController {
     @CurrentUser() user: AuthUser,
     @Body() data: UpdateMeDto,
   ): Promise<PublicUser> {
-    return this.usersService.updateMe(user.userId, data);
+    return this.users.updateMe(user.userId, data);
   }
 }
