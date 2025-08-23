@@ -65,7 +65,7 @@ model TripMember {
   role   Role
   status MemberStatus
 
-  trip Trip @relation(fields: [tripId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
