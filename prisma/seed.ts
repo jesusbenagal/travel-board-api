@@ -1,69 +1,68 @@
-import { PrismaClient, Role, MemberStatus, Visibility } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import {
+  PrismaClient,
+  Role,
+  InviteStatus,
+  ItemType,
+  Visibility,
+} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'owner@example.com';
-  const plainPass = 'Password123';
-  const passwordHash = await bcrypt.hash(plainPass, 10);
-
-  // Upsert user
-  const user = await prisma.user.upsert({
-    where: { email },
+  const owner = await prisma.user.upsert({
+    where: { email: 'owner050@example.com' },
     update: {},
-    create: { email, passwordHash, name: 'Owner Seed' },
+    create: {
+      email: 'owner050@example.com',
+      passwordHash: 'x',
+      name: 'Owner 050',
+    },
   });
 
-  // Create trip if not exists
-  const existingTrip = await prisma.trip.findFirst({
-    where: { ownerId: user.id },
+  const trip = await prisma.trip.create({
+    data: {
+      ownerId: owner.id,
+      title: 'v0.5 Seed Trip',
+      startDate: new Date('2025-06-01T00:00:00Z'),
+      endDate: new Date('2025-06-07T00:00:00Z'),
+      timezone: 'Europe/Madrid',
+      visibility: Visibility.PRIVATE,
+      members: {
+        create: { userId: owner.id, role: 'OWNER', status: 'ACCEPTED' },
+      },
+    },
   });
 
-  if (!existingTrip) {
-    const start = new Date();
-    const end = new Date();
-    end.setDate(start.getDate() + 3);
+  await prisma.invite.create({
+    data: {
+      tripId: trip.id,
+      invitedById: owner.id,
+      email: 'viewer050@example.com',
+      role: Role.VIEWER,
+      status: InviteStatus.PENDING,
+      token: 'demo-token-050',
+      expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000),
+    },
+  });
 
-    const trip = await prisma.trip.create({
-      data: {
-        ownerId: user.id,
-        title: 'Viaje de ejemplo',
-        description: 'Seed de desarrollo',
-        startDate: start,
-        endDate: end,
-        timezone: 'Europe/Madrid',
-        visibility: Visibility.PRIVATE,
-      },
-    });
+  await prisma.item.create({
+    data: {
+      tripId: trip.id,
+      createdById: owner.id,
+      type: ItemType.PLACE,
+      title: 'Coliseo',
+      notes: 'Comprar entradas online',
+      startAt: new Date('2025-06-02T09:00:00Z'),
+      endAt: new Date('2025-06-02T12:00:00Z'),
+      timezone: 'Europe/Rome',
+      locationName: 'Colosseo',
+      url: 'https://parcocolosseo.it/',
+      order: 1,
+    },
+  });
 
-    await prisma.tripMember.create({
-      data: {
-        tripId: trip.id,
-        userId: user.id,
-        role: Role.OWNER,
-        status: MemberStatus.ACCEPTED,
-      },
-    });
-
-    console.log('Seed OK ->', {
-      user: user.email,
-      trip: trip.title,
-      login: { email, plainPass },
-    });
-  } else {
-    console.log('Seed OK -> usuario ya tenía trips. Login:', {
-      email,
-      plainPass,
-    });
-  }
+  console.log('Seed v0.5 OK', { trip: trip.title });
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(() => {
-    prisma.$disconnect().catch(console.error);
-  });
+// eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
+main().finally(async () => prisma.$disconnect());
