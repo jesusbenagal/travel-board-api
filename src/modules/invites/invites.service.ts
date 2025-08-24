@@ -43,18 +43,18 @@ export class InvitesService {
     dto: CreateInviteDto,
   ): Promise<InviteView> {
     const member = await this.access.requireMember(tripId, requesterId);
-
-    // Permisos: EDITOR puede invitar sólo como VIEWER; OWNER puede invitar como EDITOR/VIEWER
-    if (member.role === Role.EDITOR && dto.role !== Role.EDITOR) {
+    if (member.role === 'EDITOR' && dto.role !== 'VIEWER') {
       throw new ForbiddenException({
         code: 'TRIP_FORBIDDEN',
         message: 'Editors can only invite as VIEWER',
       });
     }
 
-    // No invitar a alguien que ya es miembro
+    const email = dto.email.trim().toLowerCase();
+
+    // ya es miembro?
     const existingMember = await this.prisma.tripMember.findFirst({
-      where: { tripId, user: { email: dto.email.toLowerCase() } },
+      where: { tripId, user: { email } },
       select: { userId: true },
     });
     if (existingMember) {
@@ -65,20 +65,71 @@ export class InvitesService {
       });
     }
 
-    // Si ya existe invite (por @@unique [tripId,email]) podemos reciclarlo si está expirado/declinado/accepted; si PENDING, rechazamos
+    const now = new Date();
     const token = this.generateToken();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 3600 * 1000);
+    const expiresAt = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
 
+    // ←––– PRECHECK por clave única (tripId,email)
+    const existing = await this.prisma.invite.findUnique({
+      where: { tripId_email: { tripId, email } },
+      include: { invitedBy: { select: { id: true, email: true } } },
+    });
+
+    if (existing) {
+      const isExpired = existing.expiresAt.getTime() < now.getTime();
+      const isPending = existing.status === InviteStatus.PENDING;
+
+      if (isPending && !isExpired) {
+        // conflicto controlado
+        throw new ConflictException({
+          code: 'VALIDATION_ERROR',
+          message: 'Invite already pending',
+          details: { email: 'invite_pending' },
+        });
+      }
+
+      // reciclar: reabrimos como PENDING y renovamos token/expiry
+      const updated = await this.prisma.invite.update({
+        where: { id: existing.id },
+        data: {
+          status: InviteStatus.PENDING,
+          token,
+          expiresAt,
+          respondedAt: null,
+          invitedById: requesterId,
+          role: dto.role, // permite cambiar rol al re-invitar
+        },
+        include: { invitedBy: { select: { id: true, email: true } } },
+      });
+
+      return {
+        id: updated.id,
+        tripId: updated.tripId,
+        email: updated.email,
+        role: updated.role,
+        status: updated.status,
+        token: updated.token,
+        expiresAt: updated.expiresAt,
+        invitedBy: {
+          userId: updated.invitedBy.id,
+          email: updated.invitedBy.email,
+        },
+        createdAt: updated.createdAt,
+        respondedAt: updated.respondedAt,
+      };
+    }
+
+    // creación normal
     try {
       const created = await this.prisma.invite.create({
         data: {
           tripId,
           invitedById: requesterId,
-          email: dto.email.toLowerCase(),
+          email,
           role: dto.role,
+          status: InviteStatus.PENDING,
           token,
           expiresAt,
-          status: InviteStatus.PENDING,
         },
         include: { invitedBy: { select: { id: true, email: true } } },
       });
@@ -98,61 +149,17 @@ export class InvitesService {
         createdAt: created.createdAt,
         respondedAt: created.respondedAt,
       };
-    } catch (e: unknown) {
-      // P2002 unique constraint on (tripId,email)
-      // Estrategia: si la existente no está PENDING o ya expiró, la reabrimos
+    } catch (e) {
+      // Fallback por carrera: si otro creó al mismo tiempo
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
-        e.code === 'P2002' &&
-        e.message.includes('unique constraint on (tripId,email)')
+        e.code === 'P2002'
       ) {
-        const existing = await this.prisma.invite.findUnique({
-          where: { tripId_email: { tripId, email: dto.email.toLowerCase() } },
-          include: { invitedBy: { select: { id: true, email: true } } },
+        throw new ConflictException({
+          code: 'VALIDATION_ERROR',
+          message: 'Invite already pending',
+          details: { email: 'invite_pending' },
         });
-
-        if (!existing) throw e;
-
-        const now = new Date();
-        const isExpired = existing.expiresAt.getTime() < now.getTime();
-        const canRecycle =
-          existing.status !== InviteStatus.PENDING || isExpired;
-
-        if (!canRecycle) {
-          throw new ConflictException({
-            code: 'VALIDATION_ERROR',
-            message: 'Invite already pending',
-            details: { email: 'invite_pending' },
-          });
-        }
-
-        const updated = await this.prisma.invite.update({
-          where: { id: existing.id },
-          data: {
-            status: InviteStatus.PENDING,
-            token: this.generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000),
-            respondedAt: null,
-            invitedById: requesterId,
-          },
-          include: { invitedBy: { select: { id: true, email: true } } },
-        });
-
-        return {
-          id: updated.id,
-          tripId: updated.tripId,
-          email: updated.email,
-          role: updated.role,
-          status: updated.status,
-          token: updated.token,
-          expiresAt: updated.expiresAt,
-          invitedBy: {
-            userId: updated.invitedBy.id,
-            email: updated.invitedBy.email,
-          },
-          createdAt: updated.createdAt,
-          respondedAt: updated.respondedAt,
-        };
       }
       throw e;
     }

@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   UseGuards,
@@ -47,6 +49,7 @@ export class MembersController {
   }
 
   @Delete(':userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(
     @CurrentUser() user: AuthUser,
     @Param('tripId') tripId: string,

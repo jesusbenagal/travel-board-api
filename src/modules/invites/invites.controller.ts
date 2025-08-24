@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -50,11 +52,13 @@ export class InvitesController {
   }
 
   @Post('invites/:id/accept')
+  @HttpCode(HttpStatus.OK)
   async accept(@CurrentUser() user: AuthUser, @Param('id') inviteId: string) {
     return this.invites.acceptInvite(inviteId, user.userId);
   }
 
   @Post('invites/:id/decline')
+  @HttpCode(HttpStatus.OK)
   async decline(@CurrentUser() user: AuthUser, @Param('id') inviteId: string) {
     return this.invites.declineInvite(inviteId, user.userId);
   }
