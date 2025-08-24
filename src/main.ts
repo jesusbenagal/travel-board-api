@@ -52,6 +52,9 @@ async function bootstrap() {
     // TODO: Add tags when other modules are created
     .addTag('Utilities')
     .addTag('Auth')
+    .addTag('Trips')
+    .addTag('Members')
+    .addTag('Invites')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
