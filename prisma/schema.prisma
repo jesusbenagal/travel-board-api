@@ -24,6 +24,22 @@ enum Visibility {
   LINK
 }
 
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum ItemType {
+  PLACE
+  NOTE
+  LODGING
+  TRANSPORT
+  ACTIVITY
+  LINK
+}
+
 model User {
   id           String  @id @default(cuid())
   email        String  @unique
@@ -31,8 +47,11 @@ model User {
   name         String?
   avatarUrl    String?
 
-  tripsOwned  Trip[]       @relation("TripsOwned")
-  memberships TripMember[]
+  tripsOwned   Trip[]       @relation("TripsOwned")
+  memberships  TripMember[]
+  invitesSent  Invite[]     @relation("InvitesByUser")
+  itemsCreated Item[]       @relation("ItemsByUser")
+  votes        ItemVote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,6 +70,8 @@ model Trip {
   visibility  Visibility @default(PRIVATE)
 
   members TripMember[]
+  invites Invite[]
+  items   Item[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -65,11 +86,80 @@ model TripMember {
   role   Role
   status MemberStatus
 
-  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
 
   @@unique([tripId, userId])
+  @@index([userId])
+}
+
+model Invite {
+  id          String @id @default(cuid())
+  tripId      String
+  trip        Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invitedById String
+  invitedBy   User   @relation("InvitesByUser", fields: [invitedById], references: [id])
+
+  email  String
+  role   Role
+  status InviteStatus @default(PENDING)
+
+  token       String    @unique
+  expiresAt   DateTime
+  respondedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([tripId, email])
+  @@index([email])
+}
+
+model Item {
+  id     String @id @default(cuid())
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdById String
+  createdBy   User   @relation("ItemsByUser", fields: [createdById], references: [id])
+
+  type  ItemType
+  title String   @db.VarChar(140)
+  notes String?
+
+  startAt  DateTime?
+  endAt    DateTime?
+  timezone String
+
+  locationName String?
+  lat          Decimal?
+  lng          Decimal?
+
+  url       String?
+  costCents Int?
+  currency  String? @db.Char(3)
+
+  order Int @default(0)
+
+  votes ItemVote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tripId, startAt])
+  @@index([createdById])
+}
+
+model ItemVote {
+  id     String @id @default(cuid())
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([itemId, userId])
   @@index([userId])
 }
