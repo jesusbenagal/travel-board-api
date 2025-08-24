@@ -1,3 +1,3 @@
 {
-  "conventionalCommits.scopes": ["Core", "Auth", "Users", "Trips"]
+  "conventionalCommits.scopes": ["Core", "Auth", "Users", "Trips", "TripAccess"]
 }
