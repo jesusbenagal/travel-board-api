@@ -5,11 +5,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { UtilitiesModule } from './utilities/utilities.module';
 import { PrismaModule } from './database/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
-
-import { validateEnv } from './config/env.validation';
 import { UsersModule } from './modules/users/users.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { MembersModule } from './modules/members/members.module';
+import { InvitesModule } from './modules/invites/invites.module';
+
+import { validateEnv } from './config/env.validation';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MembersModule } from './modules/members/members.module';
     UsersModule,
     TripsModule,
     MembersModule,
+    InvitesModule,
   ],
   controllers: [],
   providers: [],

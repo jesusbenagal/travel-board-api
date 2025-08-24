@@ -5,6 +5,7 @@
     "Users",
     "Trips",
     "TripAccess",
-    "Members"
+    "Members",
+    "Invites"
   ]
 }
