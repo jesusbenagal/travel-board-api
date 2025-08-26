@@ -11,6 +11,7 @@ import { MembersModule } from './modules/members/members.module';
 import { InvitesModule } from './modules/invites/invites.module';
 
 import { validateEnv } from './config/env.validation';
+import { ItemsModule } from './modules/items/items.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { validateEnv } from './config/env.validation';
     TripsModule,
     MembersModule,
     InvitesModule,
+    ItemsModule,
   ],
   controllers: [],
   providers: [],
