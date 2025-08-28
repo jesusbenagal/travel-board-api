@@ -45,20 +45,16 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Travel Board API')
-    .setDescription('API Base (v0): Auth, Users, Trips, Utilities')
-    .setVersion(config.get<string>('API_VERSION') ?? '0.0.1')
+    .setTitle('Trip Planner API')
+    .setDescription('Backend for collaborative trip planning')
+    .setVersion(process.env.APP_VERSION ?? '0.5.0')
     .addBearerAuth()
-    // TODO: Add tags when other modules are created
-    .addTag('Utilities')
-    .addTag('Auth')
-    .addTag('Trips')
-    .addTag('Members')
-    .addTag('Invites')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('/docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   const port = config.get<number>('PORT') ?? 3000;
 
