@@ -25,6 +25,7 @@ export async function buildTestApp(): Promise<INestApplication> {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      transformOptions: { enableImplicitConversion: true },
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
