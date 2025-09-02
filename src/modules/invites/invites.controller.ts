@@ -17,11 +17,11 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   CurrentUser,
   type AuthUser,
-} from '../../config/decorators/current-user.decorator';
+} from '../../common/decorators/current-user.decorator';
 
 import { CreateInviteDto } from './dto/create-invite.dto';
 
-import type { PaginatedResponse } from '../../config/dto/pagination.dto';
+import type { PaginatedResponse } from '../../common/dto/pagination.dto';
 import type { InviteView, MyInviteView } from './types';
 
 @ApiTags('Invites')

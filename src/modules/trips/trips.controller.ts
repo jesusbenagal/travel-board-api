@@ -20,7 +20,7 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   type AuthUser,
   CurrentUser,
-} from '../../config/decorators/current-user.decorator';
+} from '../../common/decorators/current-user.decorator';
 
 import { CreateTripDto, ListTripsQueryDto, UpdateTripDto } from './dto';
 
@@ -28,7 +28,7 @@ import type { TripResponse } from './types';
 import type {
   PaginatedResponse,
   PaginationMeta,
-} from '../../config/dto/pagination.dto';
+} from '../../common/dto/pagination.dto';
 
 @ApiTags('Trips')
 @ApiBearerAuth()

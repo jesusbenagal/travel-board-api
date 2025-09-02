@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   type AuthUser,
   CurrentUser,
-} from '../../config/decorators/current-user.decorator';
+} from '../../common/decorators/current-user.decorator';
 
 import { UpdateMeDto } from './dto';
 

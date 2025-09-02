@@ -18,7 +18,7 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   CurrentUser,
   AuthUser,
-} from '../../config/decorators/current-user.decorator';
+} from '../../common/decorators/current-user.decorator';
 
 import { UpdateMemberRoleDto } from './dto';
 

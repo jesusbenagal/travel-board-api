@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { Visibility } from '@prisma/client';
 
-import { IsIanaTimeZone } from '../../../config/validators/iana-timezone.validator';
+import { IsIanaTimeZone } from '../../../common/validators/iana-timezone.validator';
 
 export class CreateTripDto {
   @IsString()

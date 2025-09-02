@@ -7,9 +7,9 @@ import { AppModule } from './app.module';
 
 import { PrismaService } from './database/prisma.service';
 
-import { RequestIdInterceptor } from './config/interceptors/request-id.interceptor';
-import { HttpExceptionFilter } from './config/filters/http-exception.filter';
-import { requestIdMiddleware } from './config/middleware/request-id.middleware';
+import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { requestIdMiddleware } from './common/middleware/request-id.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

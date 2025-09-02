@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 import { ItemType } from '@prisma/client';
 
-import { IsIanaTimeZone } from '../../../config/validators/iana-timezone.validator';
+import { IsIanaTimeZone } from '../../../common/validators/iana-timezone.validator';
 
 export class CreateItemDto {
   @IsEnum(ItemType)

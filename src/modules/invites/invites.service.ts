@@ -14,7 +14,7 @@ import { CreateInviteDto } from './dto/create-invite.dto';
 import type {
   PaginationMeta,
   PaginatedResponse,
-} from '../../config/dto/pagination.dto';
+} from '../../common/dto/pagination.dto';
 
 import type { InviteView, MyInviteView } from './types';
 

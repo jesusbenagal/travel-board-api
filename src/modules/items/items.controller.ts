@@ -19,7 +19,7 @@ import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import {
   CurrentUser,
   type AuthUser,
-} from '../../config/decorators/current-user.decorator';
+} from '../../common/decorators/current-user.decorator';
 
 import { CreateItemDto, UpdateItemDto, ListItemsQueryDto } from './dto';
 

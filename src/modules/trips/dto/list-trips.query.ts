@@ -1,3 +1,3 @@
-import { PaginationQueryDto } from '../../../config/dto/pagination.dto';
+import { PaginationQueryDto } from '../../../common/dto/pagination.dto';
 
 export class ListTripsQueryDto extends PaginationQueryDto {}

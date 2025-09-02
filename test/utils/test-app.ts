@@ -8,8 +8,8 @@ import { AppModule } from '../../src/app.module';
 
 import { PrismaService } from '../../src/database/prisma.service';
 
-import { HttpExceptionFilter } from '../../src/config/filters/http-exception.filter';
-import { requestIdMiddleware } from '../../src/config/middleware/request-id.middleware';
+import { HttpExceptionFilter } from '../../src/common/filters/http-exception.filter';
+import { requestIdMiddleware } from '../../src/common/middleware/request-id.middleware';
 
 export async function buildTestApp(): Promise<INestApplication> {
   const moduleRef = await Test.createTestingModule({
