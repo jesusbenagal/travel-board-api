@@ -52,6 +52,7 @@ model User {
   invitesSent  Invite[]     @relation("InvitesByUser")
   itemsCreated Item[]       @relation("ItemsByUser")
   votes        ItemVote[]
+  ShareLink    ShareLink[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,9 +70,10 @@ model Trip {
   timezone    String
   visibility  Visibility @default(PRIVATE)
 
-  members TripMember[]
-  invites Invite[]
-  items   Item[]
+  members   TripMember[]
+  invites   Invite[]
+  items     Item[]
+  ShareLink ShareLink[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,4 +164,26 @@ model ItemVote {
 
   @@unique([itemId, userId])
   @@index([userId])
+}
+
+model ShareLink {
+  id     String @id @default(cuid())
+  tripId String @map("trip_id")
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  createdById String @map("created_by_id")
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  slug      String    @unique
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  maxUses   Int?
+  uses      Int       @default(0)
+  revokedAt DateTime?
+  note      String?   @db.VarChar(140)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tripId, isActive])
 }
