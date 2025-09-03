@@ -21,14 +21,7 @@ import { ShareLinksModule } from './modules/share-links/share-links.module';
       isGlobal: true,
       validate: validateEnv,
     }),
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60,
-          limit: 60,
-        },
-      ],
-    }),
+    ThrottlerModule.forRoot([{ name: 'public', ttl: 60_000, limit: 30 }]),
     UtilitiesModule,
     PrismaModule,
     AuthModule,

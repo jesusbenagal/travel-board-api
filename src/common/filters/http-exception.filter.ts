@@ -53,6 +53,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       // Si sigue en INTERNAL_ERROR, mapear por status como fallback
       if (code === 'INTERNAL_ERROR') {
+        if (status === HttpStatus.TOO_MANY_REQUESTS) code = 'RATE_LIMITED';
         if (status === HttpStatus.NOT_FOUND) code = 'NOT_FOUND';
         else if (
           status === HttpStatus.FORBIDDEN ||

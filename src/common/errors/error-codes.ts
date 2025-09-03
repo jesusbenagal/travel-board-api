@@ -15,7 +15,11 @@ export type ErrorCode =
   | 'ITEM_NOT_FOUND'
   | 'ITEM_FORBIDDEN'
   | 'VOTE_CONFLICT'
-  | 'VOTE_NOT_FOUND';
+  | 'VOTE_NOT_FOUND'
+  | 'SHARE_INVALID'
+  | 'SHARE_MAXED'
+  | 'SHARE_EXPIRED'
+  | 'RATE_LIMITED';
 
 export interface ErrorPayload {
   code: ErrorCode;
